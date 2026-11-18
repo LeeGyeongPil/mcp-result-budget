@@ -1,0 +1,77 @@
+{
+  "name": "mcp-result-budget",
+  "version": "0.1.0",
+  "description": "Make large MCP tool results behave the same in every client: split into pages that fit a budget, read back byte-exact, keep outputSchema valid.",
+  "type": "module",
+  "license": "MIT",
+  "private": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "examples/minimal.mjs",
+    "README.md",
+    "README.ko.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeeGyeongPil/mcp-result-budget.git"
+  },
+  "homepage": "https://github.com/LeeGyeongPil/mcp-result-budget#readme",
+  "bugs": {
+    "url": "https://github.com/LeeGyeongPil/mcp-result-budget/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "pagination",
+    "tool-result",
+    "typescript"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "demo": "npm run build --silent && node examples/demo.mjs",
+    "smoke:pack": "node scripts/smoke-pack.mjs",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "peerDependencies": {
+    "@modelcontextprotocol/sdk": ">=1.32.2 <2",
+    "@modelcontextprotocol/server": "^2.4.0",
+    "zod": "^3.25.0 || ^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    },
+    "@modelcontextprotocol/server": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.4.0",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@modelcontextprotocol/server": "2.4.0",
+    "@types/node": "26.6.6",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0",
+    "zod": "4.6.7"
+  }
+}
