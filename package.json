@@ -1,6 +1,6 @@
 {
   "name": "mcp-result-budget",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Make large MCP tool results behave the same in every client: split into pages that fit a budget, read back byte-exact, keep outputSchema valid.",
   "type": "module",
   "license": "MIT",

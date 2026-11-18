@@ -92,7 +92,7 @@ flowchart LR
 |---|---|---|
 | `profile` | `"portable"` | 클라이언트 프로필에서 예산을 가져옴 |
 | `maxChars` | 프로필 값 | 글자 수 예산, 1,000~500,000 정수 |
-| `maxBytes` | 프로필 값 | 바이트 한도도 함께 지정(선택) |
+| `maxBytes` | 프로필 값 | 바이트 한도도 함께 지정(선택, UTF-8 크기가 맞을 때까지 비율로 줄이며 못 맞추면 `budget-not-met` 경고, 최솟값 1,000) |
 | `charsPerToken` | `1` | 토큰 한도를 글자 수로 환산 |
 | `continuationTool` | `"read_more"` | 이어 읽기 도구 이름 |
 | `store` | `MemoryPageStore` | `get` / `set` / `delete` 가 있는 객체(`PageStore`) |
@@ -215,7 +215,7 @@ npm run demo -- --show-page logs 1   # "logs" 도구의 1쪽을 모델이 받는
 
 ```bash
 npm install
-npm test            # 파일 9개, 테스트 43개, 각각 SDK v1·v2 로 실행
+npm test            # 파일 10개, 테스트 46개, 각각 SDK v1·v2 로 실행
 npm run typecheck
 npm run build
 npm run smoke:pack  # 묶은 tarball 을 각 SDK 와 설치해 예제를 실행

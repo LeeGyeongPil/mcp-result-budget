@@ -92,7 +92,7 @@ Exports of `mcp-result-budget`:
 |---|---|---|
 | `profile` | `"portable"` | Take the budget from a client profile |
 | `maxChars` | from profile | Budget in characters, integer 1,000 to 500,000 |
-| `maxBytes` | from profile | Optional byte limit as well |
+| `maxBytes` | from profile | Optional byte limit as well (pages shrink proportionally until the UTF-8 size fits; if it cannot, a `budget-not-met` warning is added; minimum 1,000) |
 | `charsPerToken` | `1` | Converts token limits to characters |
 | `continuationTool` | `"read_more"` | Name of the reading tool |
 | `store` | `MemoryPageStore` | Any object with `get` / `set` / `delete` (`PageStore`) |
@@ -215,7 +215,7 @@ SemVer. While the version is 0.x, minor releases may change the API; changes are
 
 ```bash
 npm install
-npm test            # 9 files, 43 tests, each against SDK v1 and v2
+npm test            # 10 files, 46 tests, each against SDK v1 and v2
 npm run typecheck
 npm run build
 npm run smoke:pack  # installs the packed tarball with each SDK and runs the example

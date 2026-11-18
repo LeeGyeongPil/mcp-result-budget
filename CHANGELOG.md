@@ -3,7 +3,10 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.1] - 2026-11-18
+
+### Fixed
+- A `maxBytes` budget smaller than the multi-byte size of the text no longer collapses the page size to a handful of characters (thousands of one-character pages); the re-fit loop now scales the character cap by the measured byte ratio.
 
 ## [0.1.0] - 2026-11-18
 
