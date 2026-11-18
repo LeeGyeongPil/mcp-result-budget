@@ -2,7 +2,7 @@ import { encodeCursor, newId } from "./cursor.js";
 import type { BudgetWarning } from "./errors.js";
 import { measureBytes, measureChars } from "./measure.js";
 import type { Validator } from "./schema.js";
-import { Packer } from "./split-text.js";
+import { Packer, TEXT_OVERHEAD } from "./split-text.js";
 import { splitStructured } from "./split-structured.js";
 import {
   NOTE_META,
@@ -26,6 +26,8 @@ export interface PaginateContext {
 }
 
 const MAX_ATTEMPTS = 8;
+// Below this the packer has no room left for content (TEXT_OVERHEAD is charged per text block).
+const MIN_CAP = TEXT_OVERHEAD + 100;
 
 export function defaultNote(info: PageInfo): string {
   const n = `page ${info.index + 1}/${info.total}`;
@@ -151,7 +153,7 @@ export async function paginateResult(ctx: PaginateContext, result: CallToolResul
     continuationTool: ctx.continuationTool,
   });
   worst.content = [{ type: "text", text: noteWorst, _meta: { [NOTE_META]: true } }];
-  let cap = Math.max(100, ctx.maxChars - measureChars(worst) - (structured ? 40 : 0));
+  let cap = Math.max(MIN_CAP, ctx.maxChars - measureChars(worst) - (structured ? 40 : 0));
 
   let raw: Raw[] | undefined;
   let pages: CallToolResultLike[] = [];
@@ -159,9 +161,26 @@ export async function paginateResult(ctx: PaginateContext, result: CallToolResul
     raw = build(cap);
     if (!raw) break;
     pages = decorate(raw, remainingFor(raw));
-    const over = Math.max(...pages.map((p, i) => (raw![i]!.atomic ? 0 : excess(ctx, p))));
-    if (over <= 0 || cap <= 100) break;
-    cap = Math.max(100, cap - over);
+    let over = 0;
+    let ratio = 1;
+    pages.forEach((p, i) => {
+      if (raw![i]!.atomic) return;
+      const c = measureChars(p) - ctx.maxChars;
+      over = Math.max(over, c);
+      if (ctx.maxBytes !== undefined) {
+        const bytes = measureBytes(p);
+        // Bytes can exceed the budget by far more than chars do (multi-byte text), so a byte
+        // overshoot shrinks the char cap proportionally instead of subtracting raw bytes.
+        if (bytes > ctx.maxBytes && bytes - ctx.maxBytes > c) {
+          ratio = Math.min(ratio, ctx.maxBytes / bytes);
+          over = Math.max(over, 1);
+        }
+      }
+    });
+    if (over <= 0 || cap <= MIN_CAP) break;
+    const byChars = cap - over;
+    const byBytes = Math.floor(cap * ratio * 0.97);
+    cap = Math.max(MIN_CAP, Math.min(byChars, byBytes, cap - 1));
   }
 
   if (!raw) {
